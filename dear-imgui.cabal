@@ -95,12 +95,8 @@ library
       extra-libraries:
         vulkan-1
     else
-      if os(darwin)
-        extra-libraries:
-          vulkan
-      else
-        pkgconfig-depends:
-          vulkan
+      extra-libraries:
+        vulkan
 
   if flag(sdl)
     exposed-modules:
@@ -109,13 +105,8 @@ library
       sdl2
     cxx-sources:
       imgui/backends/imgui_impl_sdl.cpp
-
-    if os(windows) || os(darwin)
-      extra-libraries:
-        SDL2
-    else
-      pkgconfig-depends:
-        sdl2
+    extra-libraries:
+      SDL2
 
     if flag(opengl)
       exposed-modules:
@@ -133,8 +124,9 @@ library
     cxx-sources:
       imgui/backends/imgui_impl_glfw.cpp
 
-    pkgconfig-depends:
-      glfw3
+    if os(linux) || os(darwin)
+      extra-libraries:
+        glfw
 
     if flag(opengl)
       exposed-modules:
