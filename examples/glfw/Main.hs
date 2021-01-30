@@ -9,7 +9,7 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Managed
 import DearImGui
-import DearImGui.OpenGL
+import DearImGui.OpenGL3
 import DearImGui.GLFW
 import DearImGui.GLFW.OpenGL
 import Graphics.GL
@@ -22,6 +22,14 @@ main = do
   unless initialised $ error "GLFW init failed"
 
   runManaged $ do
+    liftIO $ do
+      GLFW.windowHint (GLFW.WindowHint'ClientAPI              GLFW.ClientAPI'OpenGL)
+      GLFW.windowHint (GLFW.WindowHint'ContextVersionMajor    3)
+      GLFW.windowHint (GLFW.WindowHint'ContextVersionMinor    2)
+      GLFW.windowHint (GLFW.WindowHint'OpenGLProfile          GLFW.OpenGLProfile'Core)
+      GLFW.windowHint (GLFW.WindowHint'OpenGLForwardCompat    True)
+      GLFW.windowHint (GLFW.WindowHint'sRGBCapable            True)
+      GLFW.windowHint (GLFW.WindowHint'Samples                (Just 4))
     mwin <- managed $ bracket
       (GLFW.createWindow 800 600 "Hello, Dear ImGui!" Nothing Nothing)
       (maybe (return ()) GLFW.destroyWindow)
@@ -38,7 +46,7 @@ main = do
         _ <- managed_ $ bracket_ (glfwInitForOpenGL win True) glfwShutdown
 
         -- Initialize ImGui's OpenGL backend
-        _ <- managed_ $ bracket_ openGL2Init openGL2Shutdown
+        _ <- managed_ $ bracket_ openGL3Init openGL3Shutdown
 
         liftIO $ mainLoop win
       Nothing -> do
@@ -54,7 +62,7 @@ mainLoop win = do
   unless close do
 
     -- Tell ImGui we're starting a new frame
-    openGL2NewFrame
+    openGL3NewFrame
     glfwNewFrame
     newFrame
 
@@ -75,7 +83,7 @@ mainLoop win = do
     glClear GL_COLOR_BUFFER_BIT
 
     render
-    openGL2RenderDrawData =<< getDrawData
+    openGL3RenderDrawData =<< getDrawData
 
     GLFW.swapBuffers win
 
